@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic-Tac-Toe Game</title>
+  </head>
+  <body>
+    <div class="board" id="board"></div>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background: #011405;
+      }
+
+      .board {
+        width: 100%;
+        max-width: 600px;
+        margin: 20px auto;
+        display: grid;
+        grid-template-columns: repeat(15, 1fr);
+        border: 2px solid #c5fc7e;
+      }
+
+      .board > div::before {
+        content: "";
+        padding-bottom: 100%;
+      }
+
+      .tile {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 30px;
+        font-weight: bold;
+        border: 1px solid #bdeb97;
+        color: #cae7db;
+      }
+    </style>
+    <script>
+      const state = {
+        board: Array(15 * 15),
+        xNext: true,
+        gameOver: false,
+        whoWon: undefined,
+      };
+
+      onload = function () {
+        createBoard();
+        addEventListener(
+          "ontouchstart" in document ? "touchstart" : "mousedown",
+          handleClick
+        );
+      };
+
+      function checkWinner() {
+        const board = state.board;
+        for (let i = 0; i < 15; i++) {
+          let counter = 0;
+          for (let j = 0; j < 15; j++) {
+            const idx = 15 * i + j;
+            if (board[idx]) {
+              if (counter == 0 || board[idx] == board[idx - 1]) {
+                if (++counter == 5) {
+                  return Array(5)
+                    .fill(0)
+                    .map((e, i) => idx - 4 + i);
+                }
+              } else {
+                counter = 1;
+              }
+            } else {
+              counter = 0;
+            }
+          }
+        }
+        for (let i = 0; i < 15; i++) {
+          let counter = 0;
+          for (let j = 0; j < 15; j++) {
+            const idx = i + 15 * j;
+            if (board[idx]) {
+              if (counter == 0 || board[idx] == board[idx - 15]) {
+                if (++counter == 5) {
+                  return Array(5)
+                    .fill(0)
+                    .map((e, i) => idx - 4 * 15 + 15 * i);
+                }
+              } else {
+                counter = 1;
+              }
+            } else {
+              counter = 0;
+            }
+          }
+        }
+        for (let i = -15; i < 15; i++) {
+          let counter = 0;
+          for (let j = 0; j < 15; j++) {
+            const y = i + j;
+            if (y < 0 || y >= 15) continue;
+            const idx = y * 15 + j;
+            if (board[idx]) {
+              if (counter == 0 || board[idx] == board[idx - 16]) {
+                if (++counter == 5) {
+                  return Array(5)
+                    .fill(0)
+                    .map((e, i) => idx - 4 * 16 + 16 * i);
+                }
+              } else {
+                counter = 1;
+              }
+            } else {
+              counter = 0;
+            }
+          }
+        }
+        for (let i = -15; i < 15; i++) {
+          let counter = 0;
+          for (let j = 0; j < 15; j++) {
+            const y = i + j;
+            if (y < 0 || y >= 15) continue;
+            const idx = y * 15 + 14 - j;
+            if (board[idx]) {
+              if (counter == 0 || board[idx] == board[idx - 14]) {
+                if (++counter == 5) {
+                  return Array(5)
+                    .fill(0)
+                    .map((e, i) => idx - 4 * 14 + 14 * i);
+                }
+              } else {
+                counter = 1;
+              }
+            } else {
+              counter = 0;
+            }
+          }
+        }
+        return Array(5).fill(-1);
+      }
+
+      function createBoard() {
+        let html = "";
+        for (let i = 0; i < 225; i++) {
+          html += "<div class='tile' id=" + i + "></div>";
+        }
+        document.getElementById("board").innerHTML = html;
+      }
+
+      function handleClick(e) {
+        const elem = e.target;
+        if (elem.classList.contains("tile")) {
+          place(elem.id);
+        }
+      }
+
+      function place(i) {
+        if (!state.board[i] && !state.gameOver) {
+          state.board[i] = state.xNext ? "X" : "O";
+          const result = checkWinner();
+          if (result[0] != -1) {
+            state.gameOver = true;
+            state.whoWon = state.board[result[0]];
+            result.forEach((e) => {
+              document.getElementById(e).style.color = "#ff0000";
+            });
+          }
+          document.getElementById(i).innerHTML = state.board[i];
+          state.xNext = !state.xNext;
+        }
+      }
+    </script>
+  </body>
+</html>
